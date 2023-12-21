@@ -13,10 +13,8 @@ We are performing a very comprehensive data analysis on both 'spotify52kData.csv
 Our solutions are included in [capstone_DS14.pdf](/capstone_DS14.pdf) and their assocaited codes are included in [DS14_code.py](/DS14_code.py).
 
 ## Data Description
-This “spotify52kData.csv” dataset consists of data on 52,000 songs that were randomly picked from a variety of genres sorted in alphabetic order (a as in “acoustic” to h as in “hiphop”). For the purposes of this analysis, you can assume that the data for one song are independent for data from other songs.
-### key features:
-- **Row 1**: Column headers
-- **Row 2-52001**: Specific individual songs
+This “spotify52kData.csv” dataset consists of data on 52,000 songs that were randomly picked from a variety of genres sorted in alphabetic order (a as in “acoustic” to h as in “hiphop”). For the purposes of this analysis, we assume that the data for one song are independent for data from other songs. The first row of this dataset is the column headers, and the remaining rows (from 2 to 52001) are specific individual songs.
+### features:
 - **songNumber**: the track ID of the song, from 0 to 51999. Column 2: artist(s) – the artist(s) who are credited with creating the song. Column 3: album_name – the name of the album
 - **track_name**: the title of the specific track corresponding to the track ID
 - **popularity**: this is an important metric provided by spotify, an integer from 0 to 100, where a higher number corresponds to a higher number of plays on spotify.
@@ -33,3 +31,7 @@ This “spotify52kData.csv” dataset consists of data on 52,000 songs that were
 - **time_signature**: how many beats there are in a measure (usually 4 or 3)
 - **track_genre**: genre assigned by spotify, e.g. “blues” or “classical”. 1k songs per genre.
 In addition, there is a file (“starRatings.csv”) that contains explicit feedback, specifically star ratings from 10k users on 5k songs they listened to, on a scale from 0 (lowest) to 4 (highest). In this file, there are no headers. Each row corresponds to a user and each column to a song, specifically to the first 5k rows (songs) in the spotify52kData.csv dataset, in the same order. Missing data is represented as nans.
+
+## Authors
+- **Joz Zhou**
+- **Erchi Zhang**
