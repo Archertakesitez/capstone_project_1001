@@ -15,8 +15,8 @@ Our solutions are included in [capstone_DS14.pdf](/capstone_DS14.pdf) and their 
 ## Data Description
 This dataset consists of data on 52,000 songs that were randomly picked from a variety of genres sorted in alphabetic order (a as in “acoustic” to h as in “hiphop”). For the purposes of this analysis, you can assume that the data for one song are independent for data from other songs.
 This data is stored in the file “spotify52kData.csv”, as follows:
--**Row 1** - Column headers
--**Row 2-52001** - Specific individual songs
+- **Row 1** - Column headers
+- **Row 2-52001** - Specific individual songs
 -**songNumber** - the track ID of the song, from 0 to 51999. Column 2: artist(s) – the artist(s) who are credited with creating the song. Column 3: album_name – the name of the album
 -**track_name** – the title of the specific track corresponding to the track ID
 -**popularity** – this is an important metric provided by spotify, an integer from 0 to 100, where a higher number corresponds to a higher number of plays on spotify.
