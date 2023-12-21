@@ -5,7 +5,6 @@ Capstone Project for NYU's Graduate course DS-GA 1001
 
 - [Introduction](#introduction)
 - [Data Description](#data-description)
-- [Installation](#installation)
 - [Authors](#authors)
 
 ## Introduction
