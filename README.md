@@ -36,7 +36,7 @@ This “spotify52kData.csv” dataset consists of data on 52,000 songs that were
 - **time_signature**: how many beats there are in a measure (usually 4 or 3)
 - **track_genre**: genre assigned by spotify, e.g. “blues” or “classical”. 1k songs per genre.\
 
-In addition, there is a file (“starRatings.csv”) that contains explicit feedback, specifically star ratings from 10k users on 5k songs they listened to, on a scale from 0 (lowest) to 4 (highest). In this file, there are no headers. Each row corresponds to a user and each column to a song, specifically to the first 5k rows (songs) in the spotify52kData.csv dataset, in the same order. Missing data is represented as nans.
+#### In addition, there is a file (“starRatings.csv”) that contains explicit feedback, specifically star ratings from 10k users on 5k songs they listened to, on a scale from 0 (lowest) to 4 (highest). In this file, there are no headers. Each row corresponds to a user and each column to a song, specifically to the first 5k rows (songs) in the spotify52kData.csv dataset, in the same order. Missing data is represented as nans.
 
 ## Authors
 - **[Erchi Zhang](https://github.com/Archertakesitez)**
