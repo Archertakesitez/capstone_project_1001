@@ -8,7 +8,8 @@ Capstone Project for NYU's Graduate course DS-GA 1001
 - [Authors](#authors)
 
 ## Introduction
-We are performing a very comprehensive data analysis on both 'spotify52kData.csv' and 'starRatings.csv' files. The datasets are included in the [data](/data) directory; since the starRating file has exceeded the GitHub file size limit, we have uploaded its .zip version, so you have to unzip it before running our codes. We carefully followed the guidelines of [IDS Capstone project spec sheet.pdf](/IDS_Capstone_project_spec_sheet.pdf) and applied different techniques, including multiple linear regression, lasso/ridge regression, significance tests, PCA, K-means clustering, logistic regression, SVM, Random Forest, MLP neural network, recommendation system, and so forth, to solve each of the given questions. 
+We are performing a very comprehensive data analysis on both 'spotify52kData.csv' and 'starRatings.csv' files. The datasets are included in the [data](/data) directory; since the starRating file has exceeded the GitHub file size limit, we have uploaded its .zip version, so you have to unzip it before running our codes.\ 
+We carefully followed the guidelines of [IDS Capstone project spec sheet.pdf](/IDS_Capstone_project_spec_sheet.pdf) and applied different techniques, including multiple linear regression, lasso/ridge regression, significance tests, PCA, K-means clustering, logistic regression, SVM, Random Forest, MLP neural network, recommendation system, and so forth, to solve each of the given questions. 
 Our solutions are included in [capstone_DS14.pdf](/capstone_DS14.pdf) and their assocaited codes are included in both [capstone_ds14.ipynb](/capstone_ds14.ipynb) and [DS14_code.py](/DS14_code.py). You can choose either the .ipynb or the .py file to review and run our codes. 
 
 ## Data Description
@@ -34,6 +35,7 @@ This “spotify52kData.csv” dataset consists of data on 52,000 songs that were
 - **tempo**: speed of the song in beats per minute (BPM)
 - **time_signature**: how many beats there are in a measure (usually 4 or 3)
 - **track_genre**: genre assigned by spotify, e.g. “blues” or “classical”. 1k songs per genre.\
+
 In addition, there is a file (“starRatings.csv”) that contains explicit feedback, specifically star ratings from 10k users on 5k songs they listened to, on a scale from 0 (lowest) to 4 (highest). In this file, there are no headers. Each row corresponds to a user and each column to a song, specifically to the first 5k rows (songs) in the spotify52kData.csv dataset, in the same order. Missing data is represented as nans.
 
 ## Authors
