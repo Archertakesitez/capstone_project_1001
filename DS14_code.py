@@ -22,9 +22,7 @@ from tqdm import tqdm
 from scipy.stats import spearmanr
 from sklearn.linear_model import Lasso
 from sklearn.model_selection import cross_val_score, KFold
-from scipy.stats import pearsonr
-from scipy.stats import skew, normaltest
-from sklearn.preprocessing import QuantileTransformer
+from scipy.stats import skew
 from sklearn.linear_model import LinearRegression
 from sklearn.metrics import r2_score
 from sklearn.linear_model import Ridge
@@ -34,6 +32,8 @@ from sklearn.preprocessing import StandardScaler
 from surprise import Dataset, Reader, SVDpp
 from surprise.model_selection import train_test_split as surprise_train_test_split
 from surprise.accuracy import rmse
+from scipy.stats import zscore
+import statsmodels.api as sm
 
 # Setting the random seed
 random_seed = 14276662  # Joz Zhou's ID
@@ -71,55 +71,47 @@ class Question1(QuestionInterface):
         print('the number of missing values from the two associated columns are',
               df_spotify['popularity'].isnull().sum(), 'and', df_spotify['duration'].isnull().sum())
         duration_vals = np.asarray(df_spotify['duration'])
-        # plot histogram for duration
-        plt.figure(figsize=(8, 3))
-        plt.subplot(1, 2, 1)
+       #plot histogram for duration
+        plt.figure(figsize=(8,3))
+        plt.subplot(1,2,1)
         plt.hist(duration_vals)
         plt.xlabel("song length in ms")
         plt.ylabel("frequency")
         plt.title('histogram for duration of the songs')
         # Plotting histogram of popularity
-        plt.subplot(1, 2, 2)
+        plt.subplot(1,2,2)
         plt.hist(popularity_vals)
         plt.xlabel("popularity of a song")
         plt.ylabel("frequency")
         plt.title('histogram for popularity of a song')
-        # test skewness and found the duration data is highly, positively skewed
-        print(normaltest(duration_vals), normaltest(popularity_vals))
-        # transform the data via natural log transformation to normalize it
-        # so that we meet assumption for PearsonR test
-        duration_logged = np.log(duration_vals)
-        skew(duration_logged)
-        # histogram for duration of songs after natural log transformation
-        f, ax = plt.subplots()
-        ax.hist(duration_logged)
-        ax.set_xlabel("log(duration of songs)")
-        ax.set_ylabel("frequency")
-        ax.set_title("duration of songs after log transformation")
-        qt = QuantileTransformer(n_quantiles=10, random_state=random_seed)
-        duration_exp = duration_vals.reshape(-1, 1)
-        transformed_duration = qt.fit_transform(duration_exp)
-        print(normaltest(transformed_duration))
-        x = transformed_duration.reshape(-1, )
-        popularity_exp = popularity_vals.reshape(-1, 1)
-        transformed_popularity = qt.fit_transform(popularity_exp)
-        print(normaltest(transformed_popularity))
-        y = transformed_popularity.reshape(-1, )
-        reg1 = LinearRegression()
-        reg1.fit(transformed_duration, y)
-        y_hat = float(reg1.coef_[0]) * x + + reg1.intercept_
-        plt.figure(figsize=(8, 5))
-        plt.plot(x, y, 'o', ms=2)
-        plt.plot(x, y_hat, color='orange', linewidth=0.5)  # orange line for the fox
-        plt.xlabel("song length")
-        plt.ylabel("popularity of a song")
-        plt.title("normalized song length vs. popularity of a song")
+        #test skewness
+        print(skew(duration_vals),skew(popularity_vals))
+        #apply natural logarithm transformation on highly positively skewed song length data
+        logged_dur = np.log(duration_vals)
+        print(skew(logged_dur))
+        plt.hist(logged_dur)
+        plt.xlabel("natural logarithm of song length in ms")
+        plt.ylabel("frequency")
+        plt.title('histogram for song length after natural log transformation')
+        #zscoring data to spot correlation more easily
+        z_dur = zscore(logged_dur)
+        duration_added = sm.add_constant(z_dur)
+        z_pop = zscore(popularity_vals)
+        #apply linear regression model and check collinearity via p-value
+        model = sm.OLS(z_pop,duration_added).fit()
+        print(model.summary())
+        y_hat = float(model.params[1])*z_dur+ model.params[0]
+        plt.figure(figsize=(8,5))
+        plt.plot(z_dur, z_pop, 'o', ms=2)
+        plt.plot(z_dur, y_hat, color='orange', linewidth=0.5) # orange line for the fox
+        plt.xlabel("z-scored natural logarithm of song length)")
+        plt.ylabel("z-scored popularity of a song")
+        plt.title("song length vs. popularity of a song")
         plt.show()
-        r2 = r2_score(y, y_hat)
+        r2 = r2_score(z_pop,y_hat)
         print('R^2:', r2.round(3))
-        rmse = np.sqrt(np.mean(np.sum((y - y_hat) ** 2)))
+        rmse = np.sqrt(np.mean(np.sum((z_pop-y_hat)**2)))
         print('RMSE:', rmse.round(3))
-        print(pearsonr(x, y))
 
 
 # Question 2: Are explicitly rated songs more popular than songs that are not explicit?
