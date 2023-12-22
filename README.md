@@ -33,7 +33,7 @@ This “spotify52kData.csv” dataset consists of data on 52,000 songs that were
 - **valence**: this is an audio feature provided by the Spotify API. It tries to quantify how uplifting a song is. Songs with a positive mood =close to 1 and songs with a negative mood =close to 0
 - **tempo**: speed of the song in beats per minute (BPM)
 - **time_signature**: how many beats there are in a measure (usually 4 or 3)
-- **track_genre**: genre assigned by spotify, e.g. “blues” or “classical”. 1k songs per genre.
+- **track_genre**: genre assigned by spotify, e.g. “blues” or “classical”. 1k songs per genre.\
 In addition, there is a file (“starRatings.csv”) that contains explicit feedback, specifically star ratings from 10k users on 5k songs they listened to, on a scale from 0 (lowest) to 4 (highest). In this file, there are no headers. Each row corresponds to a user and each column to a song, specifically to the first 5k rows (songs) in the spotify52kData.csv dataset, in the same order. Missing data is represented as nans.
 
 ## Authors
