@@ -8,7 +8,7 @@ Capstone Project for NYU's Graduate course DS-GA 1001
 - [Authors](#authors)
 
 ## Introduction
-We are performing a very comprehensive data analysis on both 'spotify52kData.csv' and 'starRatings.csv' files. The datasets are included in the [data](/data) directory; since the starRating file has exceeded the GitHub file size limit, we have uploaded its .zip version, so you have to unzip it before running our codes.\ 
+We are performing a very comprehensive data analysis on both 'spotify52kData.csv' and 'starRatings.csv' files. The datasets are included in the [data](/data) directory; since the starRating file has exceeded the GitHub file size limit, we have uploaded its .zip version, so you have to unzip it before running our codes.\  
 We carefully followed the guidelines of [IDS Capstone project spec sheet.pdf](/IDS_Capstone_project_spec_sheet.pdf) and applied different techniques, including multiple linear regression, lasso/ridge regression, significance tests, PCA, K-means clustering, logistic regression, SVM, Random Forest, MLP neural network, recommendation system, and so forth, to solve each of the given questions. 
 Our solutions are included in [capstone_DS14.pdf](/capstone_DS14.pdf) and their assocaited codes are included in both [capstone_ds14.ipynb](/capstone_ds14.ipynb) and [DS14_code.py](/DS14_code.py). You can choose either the .ipynb or the .py file to review and run our codes. 
 
