@@ -9,7 +9,7 @@ Capstone Project for NYU's Graduate course DS-GA 1001
 
 ## Introduction
 We are performing a very comprehensive data analysis on both 'spotify52kData.csv' and 'starRatings.csv' files. We carefully followed the guidelines of [IDS Capstone project spec sheet.pdf](/IDS_Capstone_project_spec_sheet.pdf) and applied different techniques, including multiple linear regression, lasso/ridge regression, significance tests, PCA, K-means clustering, logistic regression, SVM, Random Forest, MLP neural network, recommendation system, and so forth, to solve each of the given questions. 
-Our solutions are included in [capstone_DS14.pdf](/capstone_DS14.pdf) and their assocaited codes are included in [DS14_code.py](/DS14_code.py).
+Our solutions are included in [capstone_DS14.pdf](/capstone_DS14.pdf) and their assocaited codes are included in both [capstone_ds14.ipynb](/capstone_ds14.ipynb) and [DS14_code.py](/DS14_code.py). You can choose either the .ipynb or the .py file to review and run our codes. 
 
 ## Data Description
 This “spotify52kData.csv” dataset consists of data on 52,000 songs that were randomly picked from a variety of genres sorted in alphabetic order (a as in “acoustic” to h as in “hiphop”). For the purposes of this analysis, we assume that the data for one song are independent for data from other songs. The first row of this dataset is the column headers, and the remaining rows (from 2 to 52001) are specific individual songs.
