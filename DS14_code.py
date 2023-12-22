@@ -4,7 +4,6 @@ import random
 import math
 from collections import Counter
 from scipy.stats import mannwhitneyu
-from sklearn.model_selection import train_test_split
 from sklearn.linear_model import LogisticRegression
 from sklearn.metrics import classification_report, confusion_matrix
 import matplotlib.pyplot as plt
@@ -13,11 +12,8 @@ import seaborn as sns
 from scipy.stats import levene, ttest_ind
 from scipy import stats
 from scipy.stats import chisquare
-from scipy.stats import chi2_contingency
 from sklearn.preprocessing import LabelEncoder
-from sklearn.metrics import precision_score, recall_score, f1_score, accuracy_score
 from sklearn.utils import shuffle
-from sklearn.preprocessing import StandardScaler
 from sklearn.ensemble import RandomForestClassifier
 import statsmodels.api as sm
 from sklearn.cluster import KMeans
@@ -33,48 +29,47 @@ from sklearn.linear_model import LinearRegression
 from sklearn.metrics import r2_score
 from sklearn.linear_model import Ridge
 from sklearn.decomposition import PCA
-import torch.nn as nn
-import torch.nn.functional as F
-import torch.optim as optim
-from sklearn.datasets import make_classification
-from sklearn.model_selection import train_test_split
+from sklearn.model_selection import train_test_split as sk_train_test_split
 from sklearn.preprocessing import StandardScaler
-from torch.utils.data import TensorDataset, DataLoader
 from surprise import Dataset, Reader, SVDpp
-from surprise.model_selection import train_test_split
+from surprise.model_selection import train_test_split as surprise_train_test_split
 from surprise.accuracy import rmse
 
 # Setting the random seed
-random_seed = 14276662 #Joz Zhou's ID
+random_seed = 14276662  # Joz Zhou's ID
 
 # prepare datasets
 df_spotify = pd.read_csv('data/spotify52kData.csv')
-df_ratings = pd.read_csv('data/starRatings.csv',header=None)
-df_ratings.columns = df_spotify['track_name'].iloc[:5000] # manually specifying the index to be 5000 song names
+df_ratings = pd.read_csv('data/starRatings.csv', header=None)
+df_ratings.columns = df_spotify['track_name'].iloc[:5000]  # manually specifying the index to be 5000 song names
 
 # Checking for missing values and the data types of each column
 missing_values = df_spotify.isnull().sum()
 data_types = df_spotify.dtypes
 # Overview of the dataset statistics
 dataset_statistics = df_spotify.describe(include='all')
-#it turns out the missing values are already handled in the spotify dataset
+# it turns out the missing values are already handled in the spotify dataset
 # data set overall is robust
-#set sns for later uses
+# set sns for later uses
 sns.set()
-#global popularity data for later use
+# global popularity data for later use
 popularity_vals = np.asarray(df_spotify['popularity'])
-#set basic skeleton for our question classes.
-#we build classes for each question and build a run() funtion for them to facilitate testing each result/code
+
+
+# set basic skeleton for our question classes.
+# we build classes for each question and build a run() funtion for them to facilitate testing each result/code
 class QuestionInterface(object):
     @staticmethod
     def run():
         pass
+
+
 # Q1: Is there a relationship between song length and popularity of a song? If so, is it positive or negative?
 class Question1(QuestionInterface):
     @staticmethod
     def run():
         print('the number of missing values from the two associated columns are',
-              df_spotify['popularity'].isnull().sum(),'and',df_spotify['duration'].isnull().sum())
+              df_spotify['popularity'].isnull().sum(), 'and', df_spotify['duration'].isnull().sum())
         duration_vals = np.asarray(df_spotify['duration'])
         # plot histogram for duration
         plt.figure(figsize=(8, 3))
@@ -126,6 +121,7 @@ class Question1(QuestionInterface):
         print('RMSE:', rmse.round(3))
         print(pearsonr(x, y))
 
+
 # Question 2: Are explicitly rated songs more popular than songs that are not explicit?
 class Question2(QuestionInterface):
     @staticmethod
@@ -133,7 +129,7 @@ class Question2(QuestionInterface):
         # Check for missing values and data types in relevant columns
         missing_values = df_spotify[['explicit', 'popularity']].isnull().sum()
         data_types = df_spotify[['explicit', 'popularity']].dtypes
-        print("missing values:",missing_values)
+        print("missing values:", missing_values)
         print(data_types)
         # Descriptive statistics for both groups
         desc_stats_explicit = df_spotify[df_spotify['explicit'] == True]['popularity'].describe()
@@ -157,6 +153,8 @@ class Question2(QuestionInterface):
         # Perform Welch's t-test
         t_test_result = ttest_ind(popularity_explicit, popularity_non_explicit, equal_var=False)
         print(f"\nQ2 t-test result: {t_test_result}")
+
+
 # Question 3: Are songs in major key more popular than songs in minor key?
 class Question3(QuestionInterface):
     @staticmethod
@@ -176,23 +174,27 @@ class Question3(QuestionInterface):
         print(f"Q3 levene-test result: {levene_test_q3}")
 
         # Perform Welch's t-test again after re-importing necessary library
-        t_test_result = ttest_ind(popularity_major, popularity_minor, equal_var=False, alternative = 'greater')
+        t_test_result = ttest_ind(popularity_major, popularity_minor, equal_var=False, alternative='greater')
         print(f"\nQ3 t-test result: {t_test_result}")
 
         fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(24, 8))
         # Q-Q plot for songs in major key
         stats.probplot(popularity_major, dist="norm", plot=ax1)
-        ax1.set_title("Q-Q Plot for Popularity of Songs in Major Key", fontsize = 18)
+        ax1.set_title("Q-Q Plot for Popularity of Songs in Major Key", fontsize=18)
         # Q-Q plot for songs in minor key
         stats.probplot(popularity_minor, dist="norm", plot=ax2)
-        ax2.set_title("Q-Q Plot for Popularity of Songs in Minor Key", fontsize = 18)
+        ax2.set_title("Q-Q Plot for Popularity of Songs in Minor Key", fontsize=18)
         plt.show()
+
+
 # Q4: Which of the following 10 song features:
 # duration, danceability, energy, loudness, speechiness, acousticness, instrumentalness,
 # liveness, valence and tempo predicts popularity best? How good is this model?
 column_list = ['duration', 'danceability', 'energy', 'loudness', 'speechiness', 'acousticness',
-                   'instrumentalness', 'liveness',
-                   'valence', 'tempo']
+               'instrumentalness', 'liveness',
+               'valence', 'tempo']
+
+
 class Question4(QuestionInterface):
     @staticmethod
     def run():
@@ -215,13 +217,14 @@ class Question4(QuestionInterface):
               scores_for_logged)
         cols_dict = {}
         for i in column_list:
-            cols_dict[i]=Question4.simple_linear(i)
+            cols_dict[i] = Question4.simple_linear(i)
         relevance = sorted(cols_dict.items(), key=lambda x: x[1], reverse=True)
         sorted_list = [[i[0], i[1]] for i in relevance]
         print(sorted_list)
         table_q4 = pd.DataFrame(sorted_list, columns=['song feature', 'average COD via 10-fold'])
         print(table_q4)
-        return(sorted_list)
+        return (sorted_list)
+
     @staticmethod
     def simple_linear(column_name: str):
         column = np.asarray(df_spotify[column_name])
@@ -232,14 +235,18 @@ class Question4(QuestionInterface):
         kfold = KFold(n_splits=10, shuffle=True, random_state=random_seed)
         scores = cross_val_score(reg, x, y, cv=kfold, scoring='r2')
         return scores.mean()
-#function for later use
+
+
+# function for later use
 def get_sorted_list():
     cols_dict = {}
     for i in column_list:
-        cols_dict[i]=Question4.simple_linear(i)
+        cols_dict[i] = Question4.simple_linear(i)
     relevance = sorted(cols_dict.items(), key=lambda x: x[1], reverse=True)
     sorted_list = [[i[0], i[1]] for i in relevance]
     return sorted_list
+
+
 # Q5: Building a model that uses *all* of the song features mentioned in question 4, how well can you predict popularity?
 # How much (if at all) is this model improved compared to the model in question 4).
 # How do you account for this? What happens if you regularize your model?
@@ -250,6 +257,8 @@ def make_x():
     tuple_ten = tuple(temp_list)
     x = np.concatenate(tuple_ten, axis=1)
     return x
+
+
 class Question5(QuestionInterface):
     @staticmethod
     def run():
@@ -281,7 +290,7 @@ class Question5(QuestionInterface):
         sorted_list = [[i[0], i[1] - multi_score] for i in relevance]
         table_q5_1 = pd.DataFrame(sorted_list, columns=['alpha', 'improvement of R^2'])
         print(table_q5_1)
-        print("improvement of",((best[1] - multi_score) / multi_score) * 100,"%")
+        print("improvement of", ((best[1] - multi_score) / multi_score) * 100, "%")
         print(best[1] - multi_score)
         alphas = np.arange(0, 10, 0.5)
         best = [0, multi_score]
@@ -299,15 +308,19 @@ class Question5(QuestionInterface):
         sorted_list = [[i[0], i[1] - multi_score] for i in relevance]
         table_q5_2 = pd.DataFrame(sorted_list, columns=['alpha', 'improvement of R^2'])
         print(table_q5_2)
+
+
 # Q6:When considering the 10 song features in the previous question, how many meaningful principal components can you extract?
 # What proportion of the variance do these principal components account for?
 # Using these principal components, how many clusters can you identify?
 # Do these clusters reasonably correspond to the genre labels in column 20 of the data?
 def get_PCA_transfored():
-    x=make_x()
+    x = make_x()
     zscoredData = stats.zscore(x)
     transformed = PCA(n_components=5).fit_transform(zscoredData)
     return transformed
+
+
 class Question6(QuestionInterface):
     @staticmethod
     def run():
@@ -355,11 +368,11 @@ class Question6(QuestionInterface):
         kmeans = KMeans(n_clusters=2, random_state=random_seed).fit(transformed)
         labels_kmeans = kmeans.labels_
         print(labels_kmeans)
-        #conver genres to numeric values
+        # conver genres to numeric values
         LE = LabelEncoder()
         genres = LE.fit_transform(df_spotify['track_genre'])
-        print(np.unique(genres))#52 genres
-        #below we make two lists of frequencies of genres from each cluster
+        print(np.unique(genres))  # 52 genres
+        # below we make two lists of frequencies of genres from each cluster
         cluster_zero = np.asarray(labels_kmeans == 0).nonzero()[0]
         cluster_one = np.asarray(labels_kmeans == 1).nonzero()[0]
         fit_zero = np.zeros(52)
@@ -372,7 +385,8 @@ class Question6(QuestionInterface):
             fit_one[fit_index] += 1
         fit_zero = fit_zero * np.sum(fit_one) / np.sum(fit_zero)
         print(fit_zero)
-        print(chisquare(fit_zero,fit_one))
+        print(chisquare(fit_zero, fit_one))
+
 
 # Question 7: Can you predict whether a song is in major or minor key from valence using logistic regression or a support vector machine?
 # If so, how good is this prediction? If not, is there a better one?
@@ -385,7 +399,7 @@ class Question7(QuestionInterface):
 
         X = df_spotify[['valence']]
         y = df_spotify['mode']
-        X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=random_seed)
+        X_train, X_test, y_train, y_test = sk_train_test_split(X, y, test_size=0.2, random_state=random_seed)
 
         log_reg = LogisticRegression()
         log_reg.fit(X_train, y_train)
@@ -397,7 +411,8 @@ class Question7(QuestionInterface):
         print(f'classification report: \n {report}')
         # Plotting the confusion matrix
         plt.figure(figsize=(4, 2))
-        sns.heatmap(conf_matrix, annot=True, fmt="d", cmap="Blues", xticklabels=['Minor(0)', 'Major(1)'], yticklabels=['Minor(0)', 'Major(1)'],cbar=False)
+        sns.heatmap(conf_matrix, annot=True, fmt="d", cmap="Blues", xticklabels=['Minor(0)', 'Major(1)'],
+                    yticklabels=['Minor(0)', 'Major(1)'], cbar=False)
         plt.title('Confusion Matrix')
         plt.ylabel('Actual Label')
         plt.xlabel('Predicted Label')
@@ -416,7 +431,7 @@ class Question7(QuestionInterface):
         balanced_df = shuffle(balanced_df, random_state=random_seed)
         X_balanced = balanced_df[['valence']]
         y_balanced = balanced_df['mode']
-        X_train_balanced, X_test_balanced, y_train_balanced, y_test_balanced = train_test_split(
+        X_train_balanced, X_test_balanced, y_train_balanced, y_test_balanced = sk_train_test_split(
             X_balanced, y_balanced, test_size=0.2, random_state=random_seed)
 
         log_reg_balanced = LogisticRegression()
@@ -430,7 +445,8 @@ class Question7(QuestionInterface):
         print(f'(balanced) classification report: \n {report_balanced}')
         # Plotting the confusion matrix
         plt.figure(figsize=(4, 2))
-        sns.heatmap(conf_matrix_balanced, annot=True, fmt="d", cmap="Blues", xticklabels=['Minor(0)', 'Major(1)'], yticklabels=['Minor(0)', 'Major(1)'],cbar=False)
+        sns.heatmap(conf_matrix_balanced, annot=True, fmt="d", cmap="Blues", xticklabels=['Minor(0)', 'Major(1)'],
+                    yticklabels=['Minor(0)', 'Major(1)'], cbar=False)
         plt.title('(Balanced) Confusion Matrix')
         plt.ylabel('Actual Label')
         plt.xlabel('Predicted Label')
@@ -453,12 +469,14 @@ class Question7(QuestionInterface):
 
         # Plotting the confusion matrix
         plt.figure(figsize=(4, 2))
-        sns.heatmap(conf_matrix_rf_balanced, annot=True, fmt="d", cmap="Blues", xticklabels=['Minor(0)', 'Major(1)'], yticklabels=['Minor(0)', 'Major(1)'],cbar=False)
+        sns.heatmap(conf_matrix_rf_balanced, annot=True, fmt="d", cmap="Blues", xticklabels=['Minor(0)', 'Major(1)'],
+                    yticklabels=['Minor(0)', 'Major(1)'], cbar=False)
         plt.title('(Balanced) Random Forest Confusion Matrix')
         plt.ylabel('Actual Label')
         plt.xlabel('Predicted Label')
         plt.tight_layout()
         plt.show()
+
 
 # Q8:Can you predict genre by using the 10 song features from question 4 directly
 # or the principal components you extracted in question 6 with a neural network? How well does this work?
@@ -660,6 +678,8 @@ def evaluate_model(model, val_data, val_labels, batch_size, num_samples):
     model_accuracy = (y_pred.flatten()[rand_index] == val_labels[rand_index]).mean()
 
     return model_accuracy
+
+
 class Question8(QuestionInterface):
     @staticmethod
     def run():
@@ -671,13 +691,13 @@ class Question8(QuestionInterface):
         x = stats.zscore(x)
         LE = LabelEncoder()
         genres = LE.fit_transform(df_spotify['track_genre'])
-        #predict using 10 features
+        # predict using 10 features
         num_epochs = 100
         learn_rate = 0.0005
         batch_size = 100
         num_classes = 52
         num_features = 10
-        X_train, X_test, y_train, y_test = train_test_split(x, genres, test_size=0.2, random_state=random_seed)
+        X_train, X_test, y_train, y_test = sk_train_test_split(x, genres, test_size=0.2, random_state=random_seed)
         model = MLP(num_features, num_classes)
         criterion = CrossEntropyCriterion(num_classes)
         num_samples = int(1e3)
@@ -695,8 +715,8 @@ class Question8(QuestionInterface):
         num_classes = 52
         num_features = 5
         transformed = get_PCA_transfored()
-        X_train, X_test, y_train, y_test = train_test_split(transformed, genres, test_size=0.2,
-                                                            random_state=random_seed)
+        X_train, X_test, y_train, y_test = sk_train_test_split(transformed, genres, test_size=0.2,
+                                                               random_state=random_seed)
         model = MLP(num_features, num_classes)
         criterion = CrossEntropyCriterion(num_classes)
         num_samples = int(1e3)
@@ -729,9 +749,11 @@ class Question9(QuestionInterface):
         plt.show()
 
         # Spearman's rank correlation test
-        spearman_corr, spearman_p_value = spearmanr(df_spotify['popularity'][:5000], df_spotify['average_rating'][:5000])
+        spearman_corr, spearman_p_value = spearmanr(df_spotify['popularity'][:5000],
+                                                    df_spotify['average_rating'][:5000])
         spearman_corr, spearman_p_value
-        print(f"Spearman's rank correlation between popularity and average star rating is {spearman_corr}, with a p-value of {spearman_p_value}")
+        print(
+            f"Spearman's rank correlation between popularity and average star rating is {spearman_corr}, with a p-value of {spearman_p_value}")
 
         X_ols = df_spotify[['popularity']][:5000]
         y_ols = df_spotify['average_rating'][:5000]
@@ -745,13 +767,16 @@ class Question9(QuestionInterface):
         # Q9b
         sorted_songs = df_spotify[:5000].sort_values(by='average_rating', ascending=False)
         top_10_songs = sorted_songs.head(10)
-        top_10_songs_details = top_10_songs[['artists', 'track_name', 'album_name', 'average_rating','popularity','track_genre']]
+        top_10_songs_details = top_10_songs[
+            ['artists', 'track_name', 'album_name', 'average_rating', 'popularity', 'track_genre']]
         print(top_10_songs_details)
         # here we explore the repeating entries, with conclusions in our written document
         # Finding the rows that are repeated based on both 'track_name' and 'album_name' and 'track_genre'
-        duplicates = sorted_songs[sorted_songs.duplicated(subset=['track_name', 'album_name','track_genre'], keep=False)]
-        sorted_duplicates = duplicates.sort_values(by=['track_name', 'album_name','track_genre'])
-        sorted_duplicates[['songNumber','artists','album_name','track_name','popularity','average_rating']].head()
+        duplicates = sorted_songs[
+            sorted_songs.duplicated(subset=['track_name', 'album_name', 'track_genre'], keep=False)]
+        sorted_duplicates = duplicates.sort_values(by=['track_name', 'album_name', 'track_genre'])
+        sorted_duplicates[['songNumber', 'artists', 'album_name', 'track_name', 'popularity', 'average_rating']].head()
+
 
 # Question 10: You want to create a “personal mixtape” for all 10k users who have explicit feedback for.
 # This mixtape contains individualized recommendations as to the 10 songs (out of the 5k) a given user will enjoy most.
@@ -783,12 +808,15 @@ def calculate_precision_recall(user_recommendations, df_ratings, threshold=3):
 
     return average_precision, average_recall
 
+
 # predict ratings
 def predict_ratings(user_similarity, ratings):
     mean_user_rating = ratings.mean(axis=1)
     ratings_diff = (ratings - mean_user_rating[:, np.newaxis])
-    pred = mean_user_rating[:, np.newaxis] + user_similarity.dot(ratings_diff) / np.array([np.abs(user_similarity).sum(axis=1)]).T
+    pred = mean_user_rating[:, np.newaxis] + user_similarity.dot(ratings_diff) / np.array(
+        [np.abs(user_similarity).sum(axis=1)]).T
     return pred
+
 
 # Generate recommendations
 class Question10(QuestionInterface):
@@ -796,7 +824,12 @@ class Question10(QuestionInterface):
     def run():
         reader = Reader(rating_scale=(0, 4))  # Assuming ratings are from 0 to 4
         data = Dataset.load_from_df(df_ratings.stack().reset_index(name='rating'), reader)
-        trainset, testset = train_test_split(data, test_size=0.3, random_state=random_seed)
+        trainset, testset = surprise_train_test_split(data, test_size=0.3, random_state=random_seed)
+        ### The SVD++ code might take 10 minutes to run so we commented section below###
+        # model = SVDpp(n_factors=10, n_epochs=3, lr_all=0.01)
+        # model.fit(trainset)
+        # predictions = model.test(testset)
+        # accuracy = rmse(predictions) # result: RMSE=1.0704 
         ratings_matrix = df_ratings.fillna(-1).values
         # user-user cosine similarity
         user_similarity = cosine_similarity(ratings_matrix)
@@ -815,7 +848,8 @@ class Question10(QuestionInterface):
 
         all_recommended_songs = [song for recommendations in user_recommendations.values() for song in recommendations]
         song_frequency = Counter(all_recommended_songs)
-        top_10_common_recommendations = [df_spotify.loc[song_id, 'track_name'] for song_id, _ in song_frequency.most_common(10)]
+        top_10_common_recommendations = [df_spotify.loc[song_id, 'track_name'] for song_id, _ in
+                                         song_frequency.most_common(10)]
         print(top_10_common_recommendations)
 
         top_10_common_recommendations_indices = song_frequency.most_common(10)
@@ -829,6 +863,7 @@ class Question10(QuestionInterface):
         plt.xticks(rotation=45, ha='right')
         plt.tight_layout()
         plt.show()
+
 
 # Extra Credit: Death metal and Children are two genres with great differences.
 # The former is known for harshness, while the latter is known for harmony.
@@ -849,13 +884,12 @@ class ExtraCredit(QuestionInterface):
         plt.show()
         print(mannwhitneyu(beats_death, beats_children))
 
+
 if __name__ == '__main__':
-    #below is a list with all problem classes. Running them thoroughly would print all results we obtained,
+    # below is a list with all problem classes. Running them thoroughly would print all results we obtained,
     # but the whole process would take ~20 minutes.
-    #you can just run a part of them, or run any single question you like to test our results, or modify them on your own!
-    problem_list = [Question1(),Question2(),Question3(),Question4(),Question5(),Question6(),Question7(),Question8(),Question9(),Question10(),ExtraCredit()]
+    # you can just run a part of them, or run any single question you like to test our results, or modify them on your own!
+    problem_list = [Question1(), Question2(), Question3(), Question4(), Question5(), Question6(), Question7(),
+                    Question8(), Question9(), Question10(), ExtraCredit()]
     for each_question in problem_list:
         each_question.run()
-
-
-
